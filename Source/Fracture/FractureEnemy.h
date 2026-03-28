@@ -47,6 +47,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Visual")
 	float CorruptionGlowIntensity = 1.f;
 
+	// Attack montage — assign in BP_HollowKnight
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	TObjectPtr<UAnimMontage> AttackMontage;
+
 	// Called by AI controller when in attack range
 	void TryAttack(AActor* Target);
 

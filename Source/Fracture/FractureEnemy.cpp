@@ -42,6 +42,10 @@ void AFractureEnemy::TryAttack(AActor* Target)
 
 	LastAttackTime = Now;
 
+	// Play attack montage if assigned
+	if (AttackMontage)
+		PlayAnimMontage(AttackMontage);
+
 	// Find health component on target and deal damage
 	UFractureHealthComponent* TargetHealth = Target->FindComponentByClass<UFractureHealthComponent>();
 	if (TargetHealth)
