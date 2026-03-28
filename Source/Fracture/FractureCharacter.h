@@ -42,6 +42,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> SprintAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<UInputAction> AttackAction;
+
 	// Camera
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	TObjectPtr<USpringArmComponent> CameraBoom;
@@ -52,6 +55,24 @@ protected:
 	// Health
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
 	TObjectPtr<UFractureHealthComponent> HealthComponent;
+
+	// Combat
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	float AttackDamage = 35.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	float AttackRange = 200.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	float AttackCooldown = 0.8f;
+
+	// True while attack animation is playing
+	UPROPERTY(BlueprintReadOnly, Category = "Combat")
+	bool bIsAttacking = false;
+
+	// Attack montage — assign in BP_FractureCharacter
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	TObjectPtr<UAnimMontage> AttackMontage;
 
 	// Movement settings
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
@@ -68,4 +89,9 @@ private:
 
 	UFUNCTION()
 	void OnDeath(AActor* DeadActor, AActor* Killer);
+
+	void Attack();
+	void PerformAttackTrace();
+
+	float LastAttackTime = -999.f;
 };

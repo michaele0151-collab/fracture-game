@@ -3,11 +3,13 @@
 
 #include "FractureCharacter.h"
 #include "FractureHealthComponent.h"
+#include "FractureEnemy.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "EnhancedInputComponent.h"
+#include "DrawDebugHelpers.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
 
@@ -88,6 +90,8 @@ void AFractureCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		JumpAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/Input/IA_Jump"));
 	if (!SprintAction)
 		SprintAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/Input/IA_Sprint"));
+	if (!AttackAction)
+		AttackAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/Input/IA_Attack"));
 
 	// Add mapping context
 	if (APlayerController* PC = Cast<APlayerController>(GetController()))
@@ -117,6 +121,8 @@ void AFractureCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 			EIC->BindAction(SprintAction, ETriggerEvent::Started, this, &AFractureCharacter::StartSprint);
 			EIC->BindAction(SprintAction, ETriggerEvent::Completed, this, &AFractureCharacter::StopSprint);
 		}
+		if (AttackAction)
+			EIC->BindAction(AttackAction, ETriggerEvent::Started, this, &AFractureCharacter::Attack);
 	}
 }
 
@@ -152,6 +158,72 @@ void AFractureCharacter::StartSprint()
 void AFractureCharacter::StopSprint()
 {
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+}
+
+void AFractureCharacter::Attack()
+{
+	float Now = GetWorld()->GetTimeSeconds();
+	if (Now - LastAttackTime < AttackCooldown) return;
+	if (bIsAttacking) return;
+
+	LastAttackTime = Now;
+	bIsAttacking = true;
+
+	// Play attack montage if assigned
+	if (AttackMontage)
+	{
+		float Duration = PlayAnimMontage(AttackMontage);
+		// Reset attack flag after montage
+		FTimerHandle AttackTimer;
+		GetWorldTimerManager().SetTimer(AttackTimer, [this]()
+		{
+			bIsAttacking = false;
+		}, FMath::Max(Duration, 0.3f), false);
+	}
+	else
+	{
+		// No montage — instant attack trace
+		PerformAttackTrace();
+		FTimerHandle AttackTimer;
+		GetWorldTimerManager().SetTimer(AttackTimer, [this]()
+		{
+			bIsAttacking = false;
+		}, 0.3f, false);
+	}
+
+	// Perform the damage trace
+	PerformAttackTrace();
+}
+
+void AFractureCharacter::PerformAttackTrace()
+{
+	FVector Start = GetActorLocation();
+	FVector End = Start + GetActorForwardVector() * AttackRange;
+
+	// Sphere sweep — forgiving hitbox
+	TArray<FHitResult> Hits;
+	FCollisionShape Sphere = FCollisionShape::MakeSphere(80.f);
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	GetWorld()->SweepMultiByChannel(Hits, Start, End, FQuat::Identity, ECC_Pawn, Sphere, Params);
+
+	// Debug — show attack range
+	DrawDebugSphere(GetWorld(), End, 80.f, 8, FColor::Red, false, 0.5f);
+
+	for (FHitResult& Hit : Hits)
+	{
+		AFractureEnemy* Enemy = Cast<AFractureEnemy>(Hit.GetActor());
+		if (Enemy)
+		{
+			UFractureHealthComponent* EnemyHealth = Enemy->FindComponentByClass<UFractureHealthComponent>();
+			if (EnemyHealth && !EnemyHealth->bIsDead)
+			{
+				EnemyHealth->TakeDamage(AttackDamage, this);
+				UE_LOG(LogTemp, Warning, TEXT("Player hit %s for %.1f"), *Enemy->GetName(), AttackDamage);
+			}
+		}
+	}
 }
 
 void AFractureCharacter::OnDeath(AActor* DeadActor, AActor* Killer)
