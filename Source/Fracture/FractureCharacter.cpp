@@ -41,49 +41,39 @@ AFractureCharacter::AFractureCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
-
-	// Load input assets directly — no Blueprint wiring required
-	static ConstructorHelpers::FObjectFinder<UInputMappingContext> IMC(
-		TEXT("/Game/Input/IMC_Default.IMC_Default"));
-	if (IMC.Succeeded()) DefaultMappingContext = IMC.Object;
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> IA_Move(
-		TEXT("/Game/Input/IA_Move.IA_Move"));
-	if (IA_Move.Succeeded()) MoveAction = IA_Move.Object;
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> IA_Look(
-		TEXT("/Game/Input/IA_Look.IA_Look"));
-	if (IA_Look.Succeeded()) LookAction = IA_Look.Object;
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> IA_Jump(
-		TEXT("/Game/Input/IA_Jump.IA_Jump"));
-	if (IA_Jump.Succeeded()) JumpAction = IA_Jump.Object;
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> IA_Sprint(
-		TEXT("/Game/Input/IA_Sprint.IA_Sprint"));
-	if (IA_Sprint.Succeeded()) SprintAction = IA_Sprint.Object;
 }
 
 void AFractureCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+}
 
-	// Add input mapping context
+void AFractureCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	// Load input assets at binding time — most reliable approach
+	if (!DefaultMappingContext)
+		DefaultMappingContext = LoadObject<UInputMappingContext>(nullptr, TEXT("/Game/Input/IMC_Default"));
+	if (!MoveAction)
+		MoveAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/Input/IA_Move"));
+	if (!LookAction)
+		LookAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/Input/IA_Look"));
+	if (!JumpAction)
+		JumpAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/Input/IA_Jump"));
+	if (!SprintAction)
+		SprintAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/Input/IA_Sprint"));
+
+	// Add mapping context
 	if (APlayerController* PC = Cast<APlayerController>(GetController()))
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
 			ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
 		{
 			if (DefaultMappingContext)
-			{
 				Subsystem->AddMappingContext(DefaultMappingContext, 0);
-			}
 		}
 	}
-}
 
-void AFractureCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
+	// Bind actions
 	if (UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		if (MoveAction)
