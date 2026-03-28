@@ -53,8 +53,7 @@ AFractureCharacter::AFractureCharacter()
 	// Hit flash post process
 	HitFlashPP = CreateDefaultSubobject<UPostProcessComponent>(TEXT("HitFlashPP"));
 	HitFlashPP->SetupAttachment(RootComponent);
-	HitFlashPP->bUnbound = false;
-	HitFlashPP->BlendRadius = 0.f;
+	HitFlashPP->bUnbound = true;
 	HitFlashPP->BlendWeight = 1.f;
 	HitFlashPP->Settings.bOverride_SceneColorTint = true;
 	HitFlashPP->Settings.SceneColorTint = FLinearColor(1.f, 1.f, 1.f); // neutral by default
