@@ -12,6 +12,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
+class UFractureHealthComponent;
 
 UCLASS()
 class FRACTURE_API AFractureCharacter : public ACharacter
@@ -48,6 +49,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	TObjectPtr<UCameraComponent> FollowCamera;
 
+	// Health
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
+	TObjectPtr<UFractureHealthComponent> HealthComponent;
+
 	// Movement settings
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	float WalkSpeed = 400.f;
@@ -60,4 +65,7 @@ private:
 	void Look(const FInputActionValue& Value);
 	void StartSprint();
 	void StopSprint();
+
+	UFUNCTION()
+	void OnDeath(AActor* DeadActor, AActor* Killer);
 };

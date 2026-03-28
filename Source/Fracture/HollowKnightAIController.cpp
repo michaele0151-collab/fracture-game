@@ -46,8 +46,17 @@ void AHollowKnightAIController::UpdateChase()
 		// Become aware
 		Enemy->bIsAware = true;
 
-		// Chase the player
-		MoveToActor(Player, 150.f); // stop 150 units away (attack range)
+		if (Distance <= 150.f)
+		{
+			// In attack range — stop and attack
+			StopMovement();
+			Enemy->TryAttack(Player);
+		}
+		else
+		{
+			// Chase the player
+			MoveToActor(Player, 150.f);
+		}
 	}
 	else
 	{

@@ -2,6 +2,7 @@
 // Ada (AI) — Technical Director
 
 #include "FractureCharacter.h"
+#include "FractureHealthComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -41,6 +42,9 @@ AFractureCharacter::AFractureCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
+
+	// Health component
+	HealthComponent = CreateDefaultSubobject<UFractureHealthComponent>(TEXT("HealthComponent"));
 }
 
 void AFractureCharacter::BeginPlay()
@@ -61,6 +65,12 @@ void AFractureCharacter::BeginPlay()
 		{
 			PC->GetLocalPlayer()->ViewportClient->SetMouseCaptureMode(EMouseCaptureMode::CapturePermanently);
 		}
+	}
+
+	// Hook up death
+	if (HealthComponent)
+	{
+		HealthComponent->OnDeath.AddDynamic(this, &AFractureCharacter::OnDeath);
 	}
 }
 
@@ -141,4 +151,29 @@ void AFractureCharacter::StartSprint()
 void AFractureCharacter::StopSprint()
 {
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+}
+
+void AFractureCharacter::OnDeath(AActor* DeadActor, AActor* Killer)
+{
+	// Disable input
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		DisableInput(PC);
+	}
+
+	// Ragdoll
+	GetMesh()->SetSimulatePhysics(true);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	UE_LOG(LogTemp, Warning, TEXT("Player died. Respawning in 3 seconds..."));
+
+	// Respawn after 3 seconds
+	FTimerHandle RespawnTimer;
+	GetWorldTimerManager().SetTimer(RespawnTimer, [this]()
+	{
+		if (APlayerController* PC = Cast<APlayerController>(GetController()))
+		{
+			PC->RestartLevel();
+		}
+	}, 3.f, false);
 }
