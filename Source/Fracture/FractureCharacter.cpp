@@ -46,6 +46,15 @@ AFractureCharacter::AFractureCharacter()
 void AFractureCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Lock input to game — capture mouse, hide cursor
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		FInputModeGameOnly InputMode;
+		PC->SetInputMode(InputMode);
+		PC->SetShowMouseCursor(false);
+		PC->bEnableClickEvents = false;
+	}
 }
 
 void AFractureCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
