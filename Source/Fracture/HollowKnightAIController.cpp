@@ -41,15 +41,18 @@ void AHollowKnightAIController::UpdateChase()
 
 	float Distance = FVector::Dist(Enemy->GetActorLocation(), Player->GetActorLocation());
 
+	UE_LOG(LogTemp, Warning, TEXT("HollowKnight distance to player: %.1f"), Distance);
+
 	if (Distance <= Enemy->DetectionRange)
 	{
 		// Become aware
 		Enemy->bIsAware = true;
 
-		if (Distance <= 150.f)
+		if (Distance <= 200.f)
 		{
 			// In attack range — stop and attack
 			StopMovement();
+			UE_LOG(LogTemp, Warning, TEXT("HollowKnight in attack range — attacking!"));
 			Enemy->TryAttack(Player);
 		}
 		else
