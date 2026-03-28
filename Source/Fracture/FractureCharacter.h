@@ -8,6 +8,8 @@
 #include "InputActionValue.h"
 #include "FractureCharacter.generated.h"
 
+class UFractureHUD;
+
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
@@ -73,6 +75,13 @@ protected:
 	// Attack montage — assign in BP_FractureCharacter
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	TObjectPtr<UAnimMontage> AttackMontage;
+
+	// HUD widget class — assign in BP_FractureCharacter
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
+	TSubclassOf<UFractureHUD> HUDWidgetClass;
+
+	UPROPERTY()
+	TObjectPtr<UFractureHUD> HUDWidget;
 
 	// Movement settings
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")

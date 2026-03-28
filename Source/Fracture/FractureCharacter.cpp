@@ -3,7 +3,9 @@
 
 #include "FractureCharacter.h"
 #include "FractureHealthComponent.h"
+#include "FractureHUD.h"
 #include "FractureEnemy.h"
+#include "Blueprint/UserWidget.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
@@ -70,10 +72,23 @@ void AFractureCharacter::BeginPlay()
 		}
 	}
 
-	// Hook up death
+	// Hook up death + damage flash
 	if (HealthComponent)
 	{
 		HealthComponent->OnDeath.AddDynamic(this, &AFractureCharacter::OnDeath);
+		HealthComponent->OnDamaged.AddLambda([this](AActor* DamagedActor, float Damage, AActor* Instigator)
+		{
+			if (HUDWidget)
+				HUDWidget->TriggerHitFlash();
+		});
+	}
+
+	// Create HUD widget
+	if (HUDWidgetClass)
+	{
+		HUDWidget = CreateWidget<UFractureHUD>(GetWorld(), HUDWidgetClass);
+		if (HUDWidget)
+			HUDWidget->AddToViewport();
 	}
 }
 
