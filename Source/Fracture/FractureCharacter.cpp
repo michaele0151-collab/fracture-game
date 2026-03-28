@@ -162,9 +162,9 @@ void AFractureCharacter::OnDeath(AActor* DeadActor, AActor* Killer)
 		DisableInput(PC);
 	}
 
-	// Ragdoll
-	GetMesh()->SetSimulatePhysics(true);
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	// Stop movement on death
+	GetCharacterMovement()->DisableMovement();
+	GetCharacterMovement()->StopMovementImmediately();
 
 	UE_LOG(LogTemp, Warning, TEXT("Player died. Respawning in 3 seconds..."));
 
