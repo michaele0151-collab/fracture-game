@@ -4,6 +4,7 @@
 #include "FractureEnemy.h"
 #include "FractureHealthComponent.h"
 #include "HollowKnightAIController.h"
+#include "Components/CapsuleComponent.h"
 
 AFractureEnemy::AFractureEnemy()
 {
