@@ -51,9 +51,16 @@ void AFractureCharacter::BeginPlay()
 	if (APlayerController* PC = Cast<APlayerController>(GetController()))
 	{
 		FInputModeGameOnly InputMode;
+		InputMode.SetConsumeCaptureMouseDown(false);
 		PC->SetInputMode(InputMode);
 		PC->SetShowMouseCursor(false);
 		PC->bEnableClickEvents = false;
+
+		// Force mouse capture on the viewport
+		if (PC->GetLocalPlayer() && PC->GetLocalPlayer()->ViewportClient)
+		{
+			PC->GetLocalPlayer()->ViewportClient->SetMouseCaptureMode(EMouseCaptureMode::CapturePermanently);
+		}
 	}
 }
 
