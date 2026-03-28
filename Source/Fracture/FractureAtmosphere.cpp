@@ -29,29 +29,29 @@ void AFractureAtmosphere::ApplyPostProcess()
 	PPSettings.bOverride_AutoExposureBias = true;
 	PPSettings.AutoExposureBias = Exposure;
 
-	// Contrast
-	PPSettings.bOverride_FilmContrast = true;
-	PPSettings.FilmContrast = Contrast;
-
-	// Shadow tint — deep blue-black
-	PPSettings.bOverride_ColorShadows = true;
-	PPSettings.ColorShadows = FVector4(ShadowTint.R, ShadowTint.G, ShadowTint.B, 1.f);
-
-	// Midtone tint — desaturated amber
-	PPSettings.bOverride_ColorMidtones = true;
-	PPSettings.ColorMidtones = FVector4(MidtoneTint.R, MidtoneTint.G, MidtoneTint.B, 1.f);
-
-	// Desaturate slightly — colours are muted in Zone 1
-	PPSettings.bOverride_FilmSaturation = true;
-	PPSettings.FilmSaturation = 0.7f;
-
 	// Vignette — dark edges
 	PPSettings.bOverride_VignetteIntensity = true;
 	PPSettings.VignetteIntensity = 0.6f;
 
-	// Slight grain — gritty feel
-	PPSettings.bOverride_GrainIntensity = true;
-	PPSettings.GrainIntensity = 0.3f;
+	// Color grading — Zone 1 cold dark mood
+	// Overall scene tint via color grading gain (shadows)
+	PPSettings.bOverride_ColorGradingIntensity = true;
+	PPSettings.ColorGradingIntensity = 1.0f;
+
+	// Scene color tint — desaturated cold blue
+	PPSettings.bOverride_SceneColorTint = true;
+	PPSettings.SceneColorTint = FLinearColor(0.6f, 0.65f, 0.8f); // cold blue-grey tint
+
+	// Bloom — subtle atmospheric glow
+	PPSettings.bOverride_BloomIntensity = true;
+	PPSettings.BloomIntensity = 0.3f;
+
+	// Ambient occlusion — deep shadows in crevices
+	PPSettings.bOverride_AmbientOcclusionIntensity = true;
+	PPSettings.AmbientOcclusionIntensity = 1.0f;
+
+	PPSettings.bOverride_AmbientOcclusionRadius = true;
+	PPSettings.AmbientOcclusionRadius = 200.f;
 
 	UE_LOG(LogTemp, Warning, TEXT("FractureAtmosphere: Zone 1 mood applied."));
 }
