@@ -41,6 +41,27 @@ AFractureCharacter::AFractureCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
+
+	// Load input assets directly — no Blueprint wiring required
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> IMC(
+		TEXT("/Game/Input/IMC_Default"));
+	if (IMC.Succeeded()) DefaultMappingContext = IMC.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> IA_Move(
+		TEXT("/Game/Input/IA_Move"));
+	if (IA_Move.Succeeded()) MoveAction = IA_Move.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> IA_Look(
+		TEXT("/Game/Input/IA_Look"));
+	if (IA_Look.Succeeded()) LookAction = IA_Look.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> IA_Jump(
+		TEXT("/Game/Input/IA_Jump"));
+	if (IA_Jump.Succeeded()) JumpAction = IA_Jump.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> IA_Sprint(
+		TEXT("/Game/Input/IA_Sprint"));
+	if (IA_Sprint.Succeeded()) SprintAction = IA_Sprint.Object;
 }
 
 void AFractureCharacter::BeginPlay()
@@ -53,7 +74,10 @@ void AFractureCharacter::BeginPlay()
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
 			ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
 		{
-			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+			if (DefaultMappingContext)
+			{
+				Subsystem->AddMappingContext(DefaultMappingContext, 0);
+			}
 		}
 	}
 }
@@ -62,12 +86,20 @@ void AFractureCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 {
 	if (UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		EIC->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AFractureCharacter::Move);
-		EIC->BindAction(LookAction, ETriggerEvent::Triggered, this, &AFractureCharacter::Look);
-		EIC->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		EIC->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-		EIC->BindAction(SprintAction, ETriggerEvent::Started, this, &AFractureCharacter::StartSprint);
-		EIC->BindAction(SprintAction, ETriggerEvent::Completed, this, &AFractureCharacter::StopSprint);
+		if (MoveAction)
+			EIC->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AFractureCharacter::Move);
+		if (LookAction)
+			EIC->BindAction(LookAction, ETriggerEvent::Triggered, this, &AFractureCharacter::Look);
+		if (JumpAction)
+		{
+			EIC->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+			EIC->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		}
+		if (SprintAction)
+		{
+			EIC->BindAction(SprintAction, ETriggerEvent::Started, this, &AFractureCharacter::StartSprint);
+			EIC->BindAction(SprintAction, ETriggerEvent::Completed, this, &AFractureCharacter::StopSprint);
+		}
 	}
 }
 
