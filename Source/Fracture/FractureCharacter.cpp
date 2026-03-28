@@ -6,6 +6,7 @@
 #include "FractureEnemy.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/PostProcessComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "EnhancedInputComponent.h"
@@ -48,6 +49,15 @@ AFractureCharacter::AFractureCharacter()
 
 	// Health component
 	HealthComponent = CreateDefaultSubobject<UFractureHealthComponent>(TEXT("HealthComponent"));
+
+	// Hit flash post process
+	HitFlashPP = CreateDefaultSubobject<UPostProcessComponent>(TEXT("HitFlashPP"));
+	HitFlashPP->SetupAttachment(RootComponent);
+	HitFlashPP->bUnbound = false;
+	HitFlashPP->BlendRadius = 0.f;
+	HitFlashPP->BlendWeight = 1.f;
+	HitFlashPP->Settings.bOverride_SceneColorTint = true;
+	HitFlashPP->Settings.SceneColorTint = FLinearColor(1.f, 1.f, 1.f); // neutral by default
 }
 
 void AFractureCharacter::BeginPlay()
@@ -234,12 +244,28 @@ float AFractureCharacter::GetHealthPercent() const
 	return 1.f;
 }
 
+void AFractureCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	// Fade hit flash out over time
+	if (HitFlashTimer > 0.f)
+	{
+		HitFlashTimer -= DeltaTime;
+		float Alpha = FMath::Clamp(HitFlashTimer / 0.3f, 0.f, 1.f);
+		if (HitFlashPP)
+			HitFlashPP->Settings.SceneColorTint = FLinearColor(1.f, FMath::Lerp(1.f, 0.1f, Alpha), FMath::Lerp(1.f, 0.1f, Alpha));
+	}
+	else
+	{
+		if (HitFlashPP)
+			HitFlashPP->Settings.SceneColorTint = FLinearColor(1.f, 1.f, 1.f);
+	}
+}
+
 void AFractureCharacter::OnDamaged(AActor* DamagedActor, float DamageAmount, AActor* DamageCauser)
 {
-	bWasHit = true;
-	// Blueprint HUD polls bWasHit each frame for flash effect
-	FTimerHandle ResetTimer;
-	GetWorldTimerManager().SetTimer(ResetTimer, [this]() { bWasHit = false; }, 0.2f, false);
+	HitFlashTimer = 0.3f;
 }
 
 void AFractureCharacter::OnDeath(AActor* DeadActor, AActor* Killer)

@@ -13,6 +13,7 @@ class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
 class UFractureHealthComponent;
+class UPostProcessComponent;
 
 UCLASS()
 class FRACTURE_API AFractureCharacter : public ACharacter
@@ -85,9 +86,9 @@ protected:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Health")
 	float GetHealthPercent() const;
 
-	// Hit flash event — bind in Blueprint HUD
-	UPROPERTY(BlueprintReadOnly, Category = "Health")
-	bool bWasHit = false;
+	// Post process for hit flash
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Effects")
+	TObjectPtr<UPostProcessComponent> HitFlashPP;
 
 private:
 	void Move(const FInputActionValue& Value);
@@ -106,4 +107,6 @@ private:
 
 	float LastAttackTime = -999.f;
 	float HitFlashTimer = 0.f;
+
+	virtual void Tick(float DeltaTime) override;
 };
