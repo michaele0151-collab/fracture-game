@@ -8,8 +8,6 @@
 #include "InputActionValue.h"
 #include "FractureCharacter.generated.h"
 
-class UFractureHUD;
-
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
@@ -76,19 +74,20 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	TObjectPtr<UAnimMontage> AttackMontage;
 
-	// HUD widget class — assign in BP_FractureCharacter
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HUD")
-	TSubclassOf<UFractureHUD> HUDWidgetClass;
-
-	UPROPERTY()
-	TObjectPtr<UFractureHUD> HUDWidget;
-
 	// Movement settings
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	float WalkSpeed = 400.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	float SprintSpeed = 700.f;
+
+	// Health percent exposed for Blueprint HUD
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Health")
+	float GetHealthPercent() const;
+
+	// Hit flash event — bind in Blueprint HUD
+	UPROPERTY(BlueprintReadOnly, Category = "Health")
+	bool bWasHit = false;
 
 private:
 	void Move(const FInputActionValue& Value);
@@ -106,4 +105,5 @@ private:
 	void PerformAttackTrace();
 
 	float LastAttackTime = -999.f;
+	float HitFlashTimer = 0.f;
 };

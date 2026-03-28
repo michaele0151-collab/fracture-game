@@ -3,9 +3,7 @@
 
 #include "FractureCharacter.h"
 #include "FractureHealthComponent.h"
-#include "FractureHUD.h"
 #include "FractureEnemy.h"
-#include "Blueprint/UserWidget.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
@@ -77,14 +75,6 @@ void AFractureCharacter::BeginPlay()
 	{
 		HealthComponent->OnDeath.AddDynamic(this, &AFractureCharacter::OnDeath);
 		HealthComponent->OnDamaged.AddDynamic(this, &AFractureCharacter::OnDamaged);
-	}
-
-	// Create HUD widget
-	if (HUDWidgetClass)
-	{
-		HUDWidget = CreateWidget<UFractureHUD>(GetWorld(), HUDWidgetClass);
-		if (HUDWidget)
-			HUDWidget->AddToViewport();
 	}
 }
 
@@ -237,10 +227,19 @@ void AFractureCharacter::PerformAttackTrace()
 	}
 }
 
+float AFractureCharacter::GetHealthPercent() const
+{
+	if (HealthComponent)
+		return HealthComponent->GetHealthPercent();
+	return 1.f;
+}
+
 void AFractureCharacter::OnDamaged(AActor* DamagedActor, float DamageAmount, AActor* DamageCauser)
 {
-	if (HUDWidget)
-		HUDWidget->TriggerHitFlash();
+	bWasHit = true;
+	// Blueprint HUD polls bWasHit each frame for flash effect
+	FTimerHandle ResetTimer;
+	GetWorldTimerManager().SetTimer(ResetTimer, [this]() { bWasHit = false; }, 0.2f, false);
 }
 
 void AFractureCharacter::OnDeath(AActor* DeadActor, AActor* Killer)
