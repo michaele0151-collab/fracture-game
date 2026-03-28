@@ -99,6 +99,9 @@ private:
 	UFUNCTION()
 	void OnDeath(AActor* DeadActor, AActor* Killer);
 
+	UFUNCTION()
+	void OnDamaged(AActor* DamagedActor, float DamageAmount, AActor* DamageCauser);
+
 	void Attack();
 	void PerformAttackTrace();
 

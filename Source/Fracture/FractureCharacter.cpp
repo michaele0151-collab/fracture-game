@@ -76,11 +76,7 @@ void AFractureCharacter::BeginPlay()
 	if (HealthComponent)
 	{
 		HealthComponent->OnDeath.AddDynamic(this, &AFractureCharacter::OnDeath);
-		HealthComponent->OnDamaged.AddLambda([this](AActor* DamagedActor, float Damage, AActor* Instigator)
-		{
-			if (HUDWidget)
-				HUDWidget->TriggerHitFlash();
-		});
+		HealthComponent->OnDamaged.AddDynamic(this, &AFractureCharacter::OnDamaged);
 	}
 
 	// Create HUD widget
@@ -239,6 +235,12 @@ void AFractureCharacter::PerformAttackTrace()
 			}
 		}
 	}
+}
+
+void AFractureCharacter::OnDamaged(AActor* DamagedActor, float DamageAmount, AActor* DamageCauser)
+{
+	if (HUDWidget)
+		HUDWidget->TriggerHitFlash();
 }
 
 void AFractureCharacter::OnDeath(AActor* DeadActor, AActor* Killer)
