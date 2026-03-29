@@ -13,7 +13,7 @@ AFracturePickup::AFracturePickup()
 
 	InteractSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InteractSphere"));
 	InteractSphere->SetSphereRadius(100.f);
-	InteractSphere->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+	InteractSphere->SetCollisionProfileName(TEXT("BlockAllDynamic"));
 	RootComponent = InteractSphere;
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
