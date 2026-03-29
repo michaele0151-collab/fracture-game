@@ -6,6 +6,7 @@
 #include "HollowKnightAIController.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/PointLightComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 AFractureEnemy::AFractureEnemy()
 {
@@ -59,9 +60,11 @@ void AFractureEnemy::TryAttack(AActor* Target)
 
 	LastAttackTime = Now;
 
-	// Play attack montage if assigned
+	// Play attack montage + sound
 	if (AttackMontage)
 		PlayAnimMontage(AttackMontage);
+	if (AttackSound)
+		UGameplayStatics::PlaySoundAtLocation(this, AttackSound, GetActorLocation());
 
 	// Find health component on target and deal damage
 	UFractureHealthComponent* TargetHealth = Target->FindComponentByClass<UFractureHealthComponent>();
@@ -74,6 +77,9 @@ void AFractureEnemy::TryAttack(AActor* Target)
 
 void AFractureEnemy::OnDeath(AActor* DeadActor, AActor* Killer)
 {
+	if (DeathSound)
+		UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation());
+
 	// Ragdoll
 	GetMesh()->SetSimulatePhysics(true);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);

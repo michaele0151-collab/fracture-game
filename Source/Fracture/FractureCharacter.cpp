@@ -13,6 +13,7 @@
 #include "DrawDebugHelpers.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
+#include "Kismet/GameplayStatics.h"
 
 AFractureCharacter::AFractureCharacter()
 {
@@ -175,11 +176,14 @@ void AFractureCharacter::Look(const FInputActionValue& Value)
 
 void AFractureCharacter::StartSprint()
 {
+	if (CurrentStamina <= 0.f) return;
+	bIsSprinting = true;
 	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
 }
 
 void AFractureCharacter::StopSprint()
 {
+	bIsSprinting = false;
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
 
@@ -188,6 +192,9 @@ void AFractureCharacter::Roll()
 	float Now = GetWorld()->GetTimeSeconds();
 	if (Now - LastRollTime < RollCooldown) return;
 	if (bIsRolling) return;
+
+	if (CurrentStamina < RollStaminaCost) return;
+	CurrentStamina -= RollStaminaCost;
 
 	LastRollTime = Now;
 	bIsRolling = true;
@@ -199,10 +206,12 @@ void AFractureCharacter::Roll()
 
 	LaunchCharacter(RollDir * RollDistance, true, false);
 
-	// Play roll montage if assigned
+	// Play roll montage + sound
 	float MontageDuration = 0.5f;
 	if (RollMontage)
 		MontageDuration = PlayAnimMontage(RollMontage);
+	if (RollSound)
+		UGameplayStatics::PlaySoundAtLocation(this, RollSound, GetActorLocation());
 
 	// Invincibility frames during roll
 	if (HealthComponent)
@@ -234,6 +243,10 @@ void AFractureCharacter::Attack()
 
 	LastAttackTime = Now;
 	bIsAttacking = true;
+
+	// Play attack sound
+	if (AttackSound)
+		UGameplayStatics::PlaySoundAtLocation(this, AttackSound, GetActorLocation());
 
 	// Play attack montage if assigned
 	if (AttackMontage)
@@ -316,15 +329,32 @@ void AFractureCharacter::Tick(float DeltaTime)
 		if (HitFlashPP)
 			HitFlashPP->Settings.SceneColorTint = FLinearColor(1.f, 1.f, 1.f);
 	}
+
+	// Stamina — drain while sprinting, regen otherwise
+	if (bIsSprinting && GetVelocity().SizeSquared() > 100.f)
+	{
+		CurrentStamina = FMath::Clamp(CurrentStamina - SprintStaminaCost * DeltaTime, 0.f, MaxStamina);
+		if (CurrentStamina <= 0.f)
+			StopSprint();
+	}
+	else
+	{
+		CurrentStamina = FMath::Clamp(CurrentStamina + StaminaRegenRate * DeltaTime, 0.f, MaxStamina);
+	}
 }
 
 void AFractureCharacter::OnDamaged(AActor* DamagedActor, float DamageAmount, AActor* DamageCauser)
 {
 	HitFlashTimer = 0.3f;
+	if (HitSound)
+		UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
 }
 
 void AFractureCharacter::OnDeath(AActor* DeadActor, AActor* Killer)
 {
+	if (DeathSound)
+		UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation());
+
 	// Disable input
 	if (APlayerController* PC = Cast<APlayerController>(GetController()))
 	{

@@ -14,6 +14,7 @@ class UInputMappingContext;
 class UInputAction;
 class UFractureHealthComponent;
 class UPostProcessComponent;
+class USoundBase;
 
 UCLASS()
 class FRACTURE_API AFractureCharacter : public ACharacter
@@ -101,6 +102,38 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	float SprintSpeed = 700.f;
 
+	// Stamina
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stamina")
+	float MaxStamina = 100.f;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Stamina")
+	float CurrentStamina = 100.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stamina")
+	float StaminaRegenRate = 20.f; // per second
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stamina")
+	float SprintStaminaCost = 25.f; // per second
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stamina")
+	float RollStaminaCost = 20.f; // flat per roll
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Stamina")
+	float GetStaminaPercent() const { return MaxStamina > 0.f ? CurrentStamina / MaxStamina : 0.f; }
+
+	// Sound effects — assign in BP_FractureCharacter
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	TObjectPtr<USoundBase> AttackSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	TObjectPtr<USoundBase> HitSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	TObjectPtr<USoundBase> DeathSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	TObjectPtr<USoundBase> RollSound;
+
 	// Health percent exposed for Blueprint HUD
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Health")
 	float GetHealthPercent() const;
@@ -129,6 +162,7 @@ private:
 	float LastAttackTime = -999.f;
 	float LastRollTime = -999.f;
 	float HitFlashTimer = 0.f;
+	bool bIsSprinting = false;
 
 	virtual void Tick(float DeltaTime) override;
 };

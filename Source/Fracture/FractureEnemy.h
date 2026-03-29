@@ -9,6 +9,7 @@
 
 class UFractureHealthComponent;
 class UPointLightComponent;
+class USoundBase;
 
 UCLASS()
 class FRACTURE_API AFractureEnemy : public ACharacter
@@ -55,6 +56,13 @@ public:
 	// Attack montage — assign in BP_HollowKnight
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	TObjectPtr<UAnimMontage> AttackMontage;
+
+	// Sound effects — assign in BP_HollowKnight
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	TObjectPtr<USoundBase> AttackSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	TObjectPtr<USoundBase> DeathSound;
 
 	// Called by AI controller when in attack range
 	void TryAttack(AActor* Target);
