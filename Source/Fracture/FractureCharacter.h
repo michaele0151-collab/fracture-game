@@ -150,6 +150,20 @@ protected:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Inventory")
 	int32 GetScrapMetal() const;
 
+	// Show dialogue on HUD — called by NPC
+	UFUNCTION(BlueprintImplementableEvent, Category = "Dialogue")
+	void ShowDialogue(const FText& SpeakerName, const FText& Line);
+
+	// Current dialogue state — HUD reads these
+	UPROPERTY(BlueprintReadOnly, Category = "Dialogue")
+	FText CurrentSpeakerName;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Dialogue")
+	FText CurrentDialogueLine;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Dialogue")
+	bool bDialogueActive = false;
+
 	// Post process for hit flash
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Effects")
 	TObjectPtr<UPostProcessComponent> HitFlashPP;

@@ -6,6 +6,7 @@
 #include "FractureInventory.h"
 #include "FracturePickup.h"
 #include "FractureWeapon.h"
+#include "FractureNPC.h"
 #include "FractureEnemy.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -278,25 +279,33 @@ void AFractureCharacter::UnequipWeapon()
 void AFractureCharacter::Interact()
 {
 	// Overlap sphere around player — find any nearby pickups
-	TArray<AActor*> OverlappingActors;
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_WorldDynamic));
 
+	// Check for pickups first
+	TArray<AActor*> PickupActors;
 	UKismetSystemLibrary::SphereOverlapActors(
-		GetWorld(),
-		GetActorLocation(),
-		150.f,
-		ObjectTypes,
-		AFracturePickup::StaticClass(),
-		TArray<AActor*>{this},
-		OverlappingActors
-	);
+		GetWorld(), GetActorLocation(), 150.f, ObjectTypes,
+		AFracturePickup::StaticClass(), TArray<AActor*>{this}, PickupActors);
 
-	if (OverlappingActors.Num() > 0)
+	if (PickupActors.Num() > 0)
 	{
-		AFracturePickup* Pickup = Cast<AFracturePickup>(OverlappingActors[0]);
-		if (Pickup)
-			Pickup->Interact(this);
+		AFracturePickup* Pickup = Cast<AFracturePickup>(PickupActors[0]);
+		if (Pickup) { Pickup->Interact(this); return; }
+	}
+
+	// Then check for NPCs
+	TArray<EObjectTypeQuery> PawnTypes;
+	PawnTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
+	TArray<AActor*> NPCActors;
+	UKismetSystemLibrary::SphereOverlapActors(
+		GetWorld(), GetActorLocation(), 200.f, PawnTypes,
+		AFractureNPC::StaticClass(), TArray<AActor*>{this}, NPCActors);
+
+	if (NPCActors.Num() > 0)
+	{
+		AFractureNPC* NPC = Cast<AFractureNPC>(NPCActors[0]);
+		if (NPC) NPC->Interact(this);
 	}
 }
 
