@@ -13,6 +13,7 @@ class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
 class UFractureHealthComponent;
+class UFractureInventory;
 class UPostProcessComponent;
 class USoundBase;
 
@@ -53,6 +54,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> RollAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<UInputAction> InteractAction;
+
 	// Camera
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	TObjectPtr<USpringArmComponent> CameraBoom;
@@ -63,6 +67,10 @@ protected:
 	// Health
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
 	TObjectPtr<UFractureHealthComponent> HealthComponent;
+
+	// Inventory
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
+	TObjectPtr<UFractureInventory> Inventory;
 
 	// Combat
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
@@ -158,6 +166,7 @@ private:
 	void PerformAttackTrace();
 	void ToggleCrouch();
 	void Roll();
+	void Interact();
 
 	float LastAttackTime = -999.f;
 	float LastRollTime = -999.f;

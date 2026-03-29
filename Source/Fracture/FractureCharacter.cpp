@@ -3,6 +3,8 @@
 
 #include "FractureCharacter.h"
 #include "FractureHealthComponent.h"
+#include "FractureInventory.h"
+#include "FracturePickup.h"
 #include "FractureEnemy.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -55,6 +57,9 @@ AFractureCharacter::AFractureCharacter()
 
 	// Health component
 	HealthComponent = CreateDefaultSubobject<UFractureHealthComponent>(TEXT("HealthComponent"));
+
+	// Inventory
+	Inventory = CreateDefaultSubobject<UFractureInventory>(TEXT("Inventory"));
 
 	// Hit flash post process
 	HitFlashPP = CreateDefaultSubobject<UPostProcessComponent>(TEXT("HitFlashPP"));
@@ -112,6 +117,8 @@ void AFractureCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		CrouchAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/Input/IA_Crouch"));
 	if (!RollAction)
 		RollAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/Input/IA_Roll"));
+	if (!InteractAction)
+		InteractAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/Input/IA_Interact"));
 
 	// Add mapping context
 	if (APlayerController* PC = Cast<APlayerController>(GetController()))
@@ -147,6 +154,8 @@ void AFractureCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 			EIC->BindAction(CrouchAction, ETriggerEvent::Started, this, &AFractureCharacter::ToggleCrouch);
 		if (RollAction)
 			EIC->BindAction(RollAction, ETriggerEvent::Started, this, &AFractureCharacter::Roll);
+		if (InteractAction)
+			EIC->BindAction(InteractAction, ETriggerEvent::Started, this, &AFractureCharacter::Interact);
 	}
 }
 
@@ -225,6 +234,28 @@ void AFractureCharacter::Roll()
 		if (HealthComponent)
 			HealthComponent->bInvincible = false;
 	}, FMath::Max(MontageDuration, 0.4f), false);
+}
+
+void AFractureCharacter::Interact()
+{
+	// Sphere trace in front of player to find pickups/NPCs
+	FVector Start = GetActorLocation();
+	FVector End = Start + GetActorForwardVector() * 200.f;
+
+	FHitResult Hit;
+	FCollisionShape Sphere = FCollisionShape::MakeSphere(80.f);
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	if (GetWorld()->SweepSingleByChannel(Hit, Start, End, FQuat::Identity, ECC_WorldDynamic, Sphere, Params))
+	{
+		AFracturePickup* Pickup = Cast<AFracturePickup>(Hit.GetActor());
+		if (Pickup)
+		{
+			Pickup->Interact(this);
+			return;
+		}
+	}
 }
 
 void AFractureCharacter::ToggleCrouch()
