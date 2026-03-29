@@ -5,7 +5,9 @@
 #include "FractureHealthComponent.h"
 #include "FractureInventory.h"
 #include "FracturePickup.h"
+#include "FractureWeapon.h"
 #include "FractureEnemy.h"
+#include "Components/StaticMeshComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/PostProcessComponent.h"
@@ -61,6 +63,11 @@ AFractureCharacter::AFractureCharacter()
 
 	// Inventory
 	Inventory = CreateDefaultSubobject<UFractureInventory>(TEXT("Inventory"));
+
+	// Weapon mesh — attached to hand socket
+	WeaponMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
+	WeaponMeshComponent->SetupAttachment(GetMesh(), FName("hand_r"));
+	WeaponMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	// Hit flash post process
 	HitFlashPP = CreateDefaultSubobject<UPostProcessComponent>(TEXT("HitFlashPP"));
@@ -235,6 +242,37 @@ void AFractureCharacter::Roll()
 		if (HealthComponent)
 			HealthComponent->bInvincible = false;
 	}, FMath::Max(MontageDuration, 0.4f), false);
+}
+
+void AFractureCharacter::EquipWeapon(UFractureWeapon* Weapon)
+{
+	if (!Weapon) return;
+
+	EquippedWeapon = Weapon;
+
+	// Swap mesh in hand
+	if (Weapon->WeaponMesh)
+		WeaponMeshComponent->SetStaticMesh(Weapon->WeaponMesh);
+
+	// Swap attack stats from weapon data
+	AttackDamage = Weapon->Damage;
+	AttackRange = Weapon->Range;
+
+	// Swap montage if weapon has one
+	if (Weapon->AttackMontage)
+		AttackMontage = Weapon->AttackMontage;
+
+	UE_LOG(LogTemp, Warning, TEXT("Equipped: %s"), *Weapon->DisplayName.ToString());
+}
+
+void AFractureCharacter::UnequipWeapon()
+{
+	EquippedWeapon = nullptr;
+	WeaponMeshComponent->SetStaticMesh(nullptr);
+
+	// Reset to fist defaults
+	AttackDamage = 15.f;
+	AttackRange = 150.f;
 }
 
 void AFractureCharacter::Interact()

@@ -14,8 +14,10 @@ class UInputMappingContext;
 class UInputAction;
 class UFractureHealthComponent;
 class UFractureInventory;
+class UFractureWeapon;
 class UPostProcessComponent;
 class USoundBase;
+class UStaticMeshComponent;
 
 UCLASS()
 class FRACTURE_API AFractureCharacter : public ACharacter
@@ -149,6 +151,22 @@ protected:
 	// Post process for hit flash
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Effects")
 	TObjectPtr<UPostProcessComponent> HitFlashPP;
+
+	// Weapon held in hand
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+	TObjectPtr<UStaticMeshComponent> WeaponMeshComponent;
+
+	// Currently equipped weapon data
+	UPROPERTY(BlueprintReadOnly, Category = "Combat")
+	TObjectPtr<UFractureWeapon> EquippedWeapon;
+
+	// Equip a weapon from inventory
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	void EquipWeapon(UFractureWeapon* Weapon);
+
+	// Unequip current weapon
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	void UnequipWeapon();
 
 private:
 	void Move(const FInputActionValue& Value);

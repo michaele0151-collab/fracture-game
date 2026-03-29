@@ -4,6 +4,8 @@
 #include "FracturePickup.h"
 #include "FractureItem.h"
 #include "FractureInventory.h"
+#include "FractureWeapon.h"
+#include "FractureCharacter.h"
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 
@@ -47,6 +49,12 @@ void AFracturePickup::Interact(AActor* Interactor)
 
 	if (Inventory->AddItem(Item, Quantity))
 	{
+		// Auto-equip weapons on pickup if nothing equipped
+		UFractureWeapon* WeaponItem = Cast<UFractureWeapon>(Item);
+		AFractureCharacter* Character = Cast<AFractureCharacter>(Interactor);
+		if (WeaponItem && Character && !Character->EquippedWeapon)
+			Character->EquipWeapon(WeaponItem);
+
 		Destroy();
 	}
 }
