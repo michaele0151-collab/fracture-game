@@ -5,6 +5,7 @@
 #include "FractureHealthComponent.h"
 #include "HollowKnightAIController.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/PointLightComponent.h"
 
 AFractureEnemy::AFractureEnemy()
 {
@@ -12,6 +13,15 @@ AFractureEnemy::AFractureEnemy()
 
 	// Health component
 	HealthComponent = CreateDefaultSubobject<UFractureHealthComponent>(TEXT("HealthComponent"));
+
+	// Corruption glow — deep red point light at chest height
+	CorruptionLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("CorruptionLight"));
+	CorruptionLight->SetupAttachment(RootComponent);
+	CorruptionLight->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
+	CorruptionLight->SetLightColor(FLinearColor(1.f, 0.05f, 0.f)); // deep red
+	CorruptionLight->SetIntensity(3000.f);
+	CorruptionLight->SetAttenuationRadius(200.f);
+	CorruptionLight->SetCastShadows(false);
 
 	// Auto-assign the AI controller
 	AIControllerClass = AHollowKnightAIController::StaticClass();
@@ -31,6 +41,13 @@ void AFractureEnemy::BeginPlay()
 void AFractureEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// Pulse corruption glow
+	if (CorruptionLight)
+	{
+		float Pulse = 0.7f + 0.3f * FMath::Sin(GetWorld()->GetTimeSeconds() * 3.f);
+		CorruptionLight->SetIntensity(3000.f * Pulse * CorruptionGlowIntensity);
+	}
 }
 
 void AFractureEnemy::TryAttack(AActor* Target)

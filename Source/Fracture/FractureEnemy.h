@@ -8,6 +8,7 @@
 #include "FractureEnemy.generated.h"
 
 class UFractureHealthComponent;
+class UPointLightComponent;
 
 UCLASS()
 class FRACTURE_API AFractureEnemy : public ACharacter
@@ -26,6 +27,10 @@ public:
 	// Health component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
 	TObjectPtr<UFractureHealthComponent> HealthComponent;
+
+	// Corruption glow light
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Visual")
+	TObjectPtr<UPointLightComponent> CorruptionLight;
 
 	// Detection range — how far the enemy can sense the player
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
