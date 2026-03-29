@@ -150,19 +150,7 @@ protected:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Inventory")
 	int32 GetScrapMetal() const;
 
-	// Show dialogue on HUD — called by NPC
-	UFUNCTION(BlueprintImplementableEvent, Category = "Dialogue")
-	void ShowDialogue(const FText& SpeakerName, const FText& Line);
 
-	// Current dialogue state — HUD reads these
-	UPROPERTY(BlueprintReadOnly, Category = "Dialogue")
-	FText CurrentSpeakerName;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Dialogue")
-	FText CurrentDialogueLine;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Dialogue")
-	bool bDialogueActive = false;
 
 
 
@@ -178,6 +166,19 @@ public:
 	// Inventory
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
 	TObjectPtr<UFractureInventory> Inventory;
+
+	// Show dialogue on HUD — called by NPC
+	UFUNCTION(BlueprintImplementableEvent, Category = "Dialogue")
+	void ShowDialogue(const FText& SpeakerName, const FText& Line);
+
+	UPROPERTY(BlueprintReadOnly, Category = "Dialogue")
+	FText CurrentSpeakerName;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Dialogue")
+	FText CurrentDialogueLine;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Dialogue")
+	bool bDialogueActive = false;
 
 	// Currently equipped weapon data
 	UPROPERTY(BlueprintReadOnly, Category = "Combat")
