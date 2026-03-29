@@ -47,6 +47,11 @@ AFractureCharacter::AFractureCharacter()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
+	// Enable crouch
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
+	GetCharacterMovement()->CrouchedHalfHeight = 44.f;
+	GetCharacterMovement()->MaxWalkSpeedCrouched = 150.f;
+
 	// Health component
 	HealthComponent = CreateDefaultSubobject<UFractureHealthComponent>(TEXT("HealthComponent"));
 
@@ -102,6 +107,8 @@ void AFractureCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		SprintAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/Input/IA_Sprint"));
 	if (!AttackAction)
 		AttackAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/Input/IA_Attack"));
+	if (!CrouchAction)
+		CrouchAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/Input/IA_Crouch"));
 
 	// Add mapping context
 	if (APlayerController* PC = Cast<APlayerController>(GetController()))
@@ -133,6 +140,11 @@ void AFractureCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		}
 		if (AttackAction)
 			EIC->BindAction(AttackAction, ETriggerEvent::Started, this, &AFractureCharacter::Attack);
+		if (CrouchAction)
+		{
+			EIC->BindAction(CrouchAction, ETriggerEvent::Started, this, &AFractureCharacter::StartCrouch);
+			EIC->BindAction(CrouchAction, ETriggerEvent::Completed, this, &AFractureCharacter::StopCrouch);
+		}
 	}
 }
 
@@ -168,6 +180,16 @@ void AFractureCharacter::StartSprint()
 void AFractureCharacter::StopSprint()
 {
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+}
+
+void AFractureCharacter::StartCrouch()
+{
+	Crouch();
+}
+
+void AFractureCharacter::StopCrouch()
+{
+	UnCrouch();
 }
 
 void AFractureCharacter::Attack()

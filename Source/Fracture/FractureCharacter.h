@@ -46,6 +46,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> AttackAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<UInputAction> CrouchAction;
+
 	// Camera
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	TObjectPtr<USpringArmComponent> CameraBoom;
@@ -104,6 +107,8 @@ private:
 
 	void Attack();
 	void PerformAttackTrace();
+	void StartCrouch();
+	void StopCrouch();
 
 	float LastAttackTime = -999.f;
 	float HitFlashTimer = 0.f;
