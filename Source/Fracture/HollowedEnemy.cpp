@@ -5,6 +5,7 @@
 #include "FractureHealthComponent.h"
 #include "HollowedAIController.h"
 #include "Components/PointLightComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 AHollowedEnemy::AHollowedEnemy()
 {
