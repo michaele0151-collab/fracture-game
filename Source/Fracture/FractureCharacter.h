@@ -169,13 +169,13 @@ public:
 
 	// Show dialogue on HUD — called by NPC
 	UFUNCTION(BlueprintImplementableEvent, Category = "Dialogue")
-	void ShowDialogue(const FText& SpeakerName, const FText& Line);
+	void ShowDialogue(const FString& SpeakerName, const FString& Line);
 
 	UPROPERTY(BlueprintReadOnly, Category = "Dialogue")
-	FText CurrentSpeakerName;
+	FString CurrentSpeakerName;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Dialogue")
-	FText CurrentDialogueLine;
+	FString CurrentDialogueLine;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Dialogue")
 	bool bDialogueActive = false;

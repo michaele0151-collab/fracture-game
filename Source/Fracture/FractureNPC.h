@@ -14,7 +14,7 @@ struct FDialogueLine
 
 	// The line of dialogue
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FText Line;
+	FString Line;
 
 	// Optional: only show this line if a quest is active (leave blank = always show)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -35,7 +35,7 @@ public:
 
 	// NPC name shown above dialogue
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue")
-	FText NPCName;
+	FString NPCName;
 
 	// All dialogue lines — cycles through them on repeated interact
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue")
