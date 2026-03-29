@@ -70,9 +70,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
 	TObjectPtr<UFractureHealthComponent> HealthComponent;
 
-	// Inventory
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
-	TObjectPtr<UFractureInventory> Inventory;
+
 
 	// Combat
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
@@ -161,6 +159,10 @@ protected:
 	TObjectPtr<UStaticMeshComponent> WeaponMeshComponent;
 
 public:
+	// Inventory
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
+	TObjectPtr<UFractureInventory> Inventory;
+
 	// Currently equipped weapon data
 	UPROPERTY(BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<UFractureWeapon> EquippedWeapon;

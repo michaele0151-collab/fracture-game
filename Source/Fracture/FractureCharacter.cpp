@@ -55,7 +55,7 @@ AFractureCharacter::AFractureCharacter()
 
 	// Enable crouch
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
-	GetCharacterMovement()->CrouchedHalfHeight = 44.f;
+	GetCharacterMovement()->SetCrouchedHalfHeight(44.f);
 	GetCharacterMovement()->MaxWalkSpeedCrouched = 150.f;
 
 	// Health component
