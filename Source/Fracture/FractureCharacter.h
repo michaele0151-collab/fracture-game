@@ -148,6 +148,10 @@ protected:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Health")
 	float GetHealthPercent() const;
 
+	// Scrap metal count for HUD
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Inventory")
+	int32 GetScrapMetal() const;
+
 	// Post process for hit flash
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Effects")
 	TObjectPtr<UPostProcessComponent> HitFlashPP;

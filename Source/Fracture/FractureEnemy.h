@@ -10,6 +10,8 @@
 class UFractureHealthComponent;
 class UPointLightComponent;
 class USoundBase;
+class UFractureItem;
+class AFracturePickup;
 
 UCLASS()
 class FRACTURE_API AFractureEnemy : public ACharacter
@@ -63,6 +65,17 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	TObjectPtr<USoundBase> DeathSound;
+
+	// Scrap dropped on death
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot")
+	int32 ScrapDrop = 10;
+
+	// Optional item drop on death — assign in BP
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot")
+	TObjectPtr<UFractureItem> LootItem;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot")
+	float LootDropChance = 0.3f; // 30% chance
 
 	// Called by AI controller when in attack range
 	void TryAttack(AActor* Target);

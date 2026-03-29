@@ -3,6 +3,10 @@
 
 #include "FractureEnemy.h"
 #include "FractureHealthComponent.h"
+#include "FractureInventory.h"
+#include "FractureItem.h"
+#include "FracturePickup.h"
+#include "FractureCharacter.h"
 #include "HollowKnightAIController.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/PointLightComponent.h"
@@ -79,6 +83,28 @@ void AFractureEnemy::OnDeath(AActor* DeadActor, AActor* Killer)
 {
 	if (DeathSound)
 		UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation());
+
+	// Give scrap to killer
+	AFractureCharacter* PlayerChar = Cast<AFractureCharacter>(Killer);
+	if (PlayerChar && PlayerChar->Inventory)
+	{
+		PlayerChar->Inventory->AddScrap(ScrapDrop);
+		UE_LOG(LogTemp, Warning, TEXT("Enemy dropped %d scrap. Total: %d"), ScrapDrop, PlayerChar->Inventory->ScrapMetal);
+	}
+
+	// Chance to drop loot item in world
+	if (LootItem && FMath::FRand() < LootDropChance)
+	{
+		FVector DropLocation = GetActorLocation() + FVector(0.f, 0.f, 30.f);
+		FActorSpawnParameters Params;
+		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		AFracturePickup* Pickup = GetWorld()->SpawnActor<AFracturePickup>(AFracturePickup::StaticClass(), DropLocation, FRotator::ZeroRotator, Params);
+		if (Pickup)
+		{
+			Pickup->Item = LootItem;
+			Pickup->Quantity = 1;
+		}
+	}
 
 	// Ragdoll
 	GetMesh()->SetSimulatePhysics(true);

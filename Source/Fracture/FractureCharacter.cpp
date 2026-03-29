@@ -385,6 +385,13 @@ float AFractureCharacter::GetHealthPercent() const
 	return 1.f;
 }
 
+int32 AFractureCharacter::GetScrapMetal() const
+{
+	if (Inventory)
+		return Inventory->ScrapMetal;
+	return 0;
+}
+
 void AFractureCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
