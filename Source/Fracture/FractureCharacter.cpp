@@ -16,6 +16,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 AFractureCharacter::AFractureCharacter()
 {
@@ -238,23 +239,26 @@ void AFractureCharacter::Roll()
 
 void AFractureCharacter::Interact()
 {
-	// Sphere trace in front of player to find pickups/NPCs
-	FVector Start = GetActorLocation();
-	FVector End = Start + GetActorForwardVector() * 200.f;
+	// Overlap sphere around player — find any nearby pickups
+	TArray<AActor*> OverlappingActors;
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_WorldDynamic));
 
-	FHitResult Hit;
-	FCollisionShape Sphere = FCollisionShape::MakeSphere(80.f);
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
+	UKismetSystemLibrary::SphereOverlapActors(
+		GetWorld(),
+		GetActorLocation(),
+		150.f,
+		ObjectTypes,
+		AFracturePickup::StaticClass(),
+		TArray<AActor*>{this},
+		OverlappingActors
+	);
 
-	if (GetWorld()->SweepSingleByChannel(Hit, Start, End, FQuat::Identity, ECC_WorldDynamic, Sphere, Params))
+	if (OverlappingActors.Num() > 0)
 	{
-		AFracturePickup* Pickup = Cast<AFracturePickup>(Hit.GetActor());
+		AFracturePickup* Pickup = Cast<AFracturePickup>(OverlappingActors[0]);
 		if (Pickup)
-		{
 			Pickup->Interact(this);
-			return;
-		}
 	}
 }
 
