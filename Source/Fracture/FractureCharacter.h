@@ -107,8 +107,7 @@ private:
 
 	void Attack();
 	void PerformAttackTrace();
-	void StartCrouch();
-	void StopCrouch();
+	void ToggleCrouch();
 
 	float LastAttackTime = -999.f;
 	float HitFlashTimer = 0.f;

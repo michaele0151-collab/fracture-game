@@ -141,10 +141,7 @@ void AFractureCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		if (AttackAction)
 			EIC->BindAction(AttackAction, ETriggerEvent::Started, this, &AFractureCharacter::Attack);
 		if (CrouchAction)
-		{
-			EIC->BindAction(CrouchAction, ETriggerEvent::Started, this, &AFractureCharacter::StartCrouch);
-			EIC->BindAction(CrouchAction, ETriggerEvent::Completed, this, &AFractureCharacter::StopCrouch);
-		}
+			EIC->BindAction(CrouchAction, ETriggerEvent::Started, this, &AFractureCharacter::ToggleCrouch);
 	}
 }
 
@@ -182,14 +179,12 @@ void AFractureCharacter::StopSprint()
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
 
-void AFractureCharacter::StartCrouch()
+void AFractureCharacter::ToggleCrouch()
 {
-	Crouch();
-}
-
-void AFractureCharacter::StopCrouch()
-{
-	UnCrouch();
+	if (bIsCrouched)
+		UnCrouch();
+	else
+		Crouch();
 }
 
 void AFractureCharacter::Attack()
