@@ -295,7 +295,7 @@ void AFractureCharacter::Interact()
 	}
 
 	// Then check for NPCs
-	TArray<EObjectTypeQuery> PawnTypes;
+	TArray<TEnumAsByte<EObjectTypeQuery>> PawnTypes;
 	PawnTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
 	TArray<AActor*> NPCActors;
 	UKismetSystemLibrary::SphereOverlapActors(

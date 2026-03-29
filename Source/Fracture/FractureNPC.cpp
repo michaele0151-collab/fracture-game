@@ -3,6 +3,7 @@
 
 #include "FractureNPC.h"
 #include "FractureCharacter.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 AFractureNPC::AFractureNPC()
 {

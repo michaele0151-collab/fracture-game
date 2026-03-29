@@ -164,6 +164,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Dialogue")
 	bool bDialogueActive = false;
 
+
+
 	// Post process for hit flash
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Effects")
 	TObjectPtr<UPostProcessComponent> HitFlashPP;
