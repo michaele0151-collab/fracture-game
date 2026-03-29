@@ -20,18 +20,27 @@ void AFractureNPC::BeginPlay()
 
 void AFractureNPC::Interact(AActor* Interactor)
 {
-	if (DialogueLines.Num() == 0) return;
+	UE_LOG(LogTemp, Warning, TEXT("NPC Interact called"));
+
+	if (DialogueLines.Num() == 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NPC has no dialogue lines"));
+		return;
+	}
 
 	FDialogueLine Line = GetCurrentLine();
+	UE_LOG(LogTemp, Warning, TEXT("NPC says: %s"), *Line.Line);
 
-	// Broadcast to player so HUD can display it
 	AFractureCharacter* Player = Cast<AFractureCharacter>(Interactor);
 	if (Player)
 	{
 		Player->ShowDialogue(NPCName, Line.Line);
 	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Interactor is not FractureCharacter"));
+	}
 
-	// Advance to next line
 	CurrentLineIndex = (CurrentLineIndex + 1) % DialogueLines.Num();
 }
 
