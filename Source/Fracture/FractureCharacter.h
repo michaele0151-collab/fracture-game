@@ -81,6 +81,19 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	TObjectPtr<UAnimMontage> AttackMontage;
 
+	// Roll montage — assign in BP_FractureCharacter
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	TObjectPtr<UAnimMontage> RollMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	float RollDistance = 600.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	float RollCooldown = 0.8f;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Combat")
+	bool bIsRolling = false;
+
 	// Movement settings
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	float WalkSpeed = 400.f;
@@ -112,20 +125,6 @@ private:
 	void PerformAttackTrace();
 	void ToggleCrouch();
 	void Roll();
-
-	// Roll/dodge
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
-	float RollDistance = 600.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
-	float RollCooldown = 0.8f;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Combat")
-	bool bIsRolling = false;
-
-	// Roll montage — assign in BP_FractureCharacter
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
-	TObjectPtr<UAnimMontage> RollMontage;
 
 	float LastAttackTime = -999.f;
 	float LastRollTime = -999.f;
