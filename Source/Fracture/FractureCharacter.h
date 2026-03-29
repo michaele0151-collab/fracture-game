@@ -156,6 +156,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<UStaticMeshComponent> WeaponMeshComponent;
 
+public:
 	// Currently equipped weapon data
 	UPROPERTY(BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<UFractureWeapon> EquippedWeapon;
@@ -167,6 +168,8 @@ protected:
 	// Unequip current weapon
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void UnequipWeapon();
+
+protected:
 
 private:
 	void Move(const FInputActionValue& Value);
