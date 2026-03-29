@@ -28,6 +28,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Health")
 	bool bIsDead = false;
 
+	// Invincibility frames — set true during roll
+	UPROPERTY(BlueprintReadWrite, Category = "Health")
+	bool bInvincible = false;
+
 	// Called when damage is taken
 	UPROPERTY(BlueprintAssignable, Category = "Health")
 	FOnDamaged OnDamaged;

@@ -49,6 +49,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> CrouchAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<UInputAction> RollAction;
+
 	// Camera
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	TObjectPtr<USpringArmComponent> CameraBoom;
@@ -108,8 +111,24 @@ private:
 	void Attack();
 	void PerformAttackTrace();
 	void ToggleCrouch();
+	void Roll();
+
+	// Roll/dodge
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	float RollDistance = 600.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	float RollCooldown = 0.8f;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Combat")
+	bool bIsRolling = false;
+
+	// Roll montage — assign in BP_FractureCharacter
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	TObjectPtr<UAnimMontage> RollMontage;
 
 	float LastAttackTime = -999.f;
+	float LastRollTime = -999.f;
 	float HitFlashTimer = 0.f;
 
 	virtual void Tick(float DeltaTime) override;

@@ -16,7 +16,7 @@ void UFractureHealthComponent::BeginPlay()
 
 void UFractureHealthComponent::TakeDamage(float Amount, AActor* DamageCauser)
 {
-	if (bIsDead || Amount <= 0.f) return;
+	if (bIsDead || bInvincible || Amount <= 0.f) return;
 
 	CurrentHealth = FMath::Clamp(CurrentHealth - Amount, 0.f, MaxHealth);
 	OnDamaged.Broadcast(GetOwner(), Amount, DamageCauser);

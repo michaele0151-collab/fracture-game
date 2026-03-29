@@ -109,6 +109,8 @@ void AFractureCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		AttackAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/Input/IA_Attack"));
 	if (!CrouchAction)
 		CrouchAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/Input/IA_Crouch"));
+	if (!RollAction)
+		RollAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/Input/IA_Roll"));
 
 	// Add mapping context
 	if (APlayerController* PC = Cast<APlayerController>(GetController()))
@@ -142,6 +144,8 @@ void AFractureCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 			EIC->BindAction(AttackAction, ETriggerEvent::Started, this, &AFractureCharacter::Attack);
 		if (CrouchAction)
 			EIC->BindAction(CrouchAction, ETriggerEvent::Started, this, &AFractureCharacter::ToggleCrouch);
+		if (RollAction)
+			EIC->BindAction(RollAction, ETriggerEvent::Started, this, &AFractureCharacter::Roll);
 	}
 }
 
@@ -177,6 +181,41 @@ void AFractureCharacter::StartSprint()
 void AFractureCharacter::StopSprint()
 {
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+}
+
+void AFractureCharacter::Roll()
+{
+	float Now = GetWorld()->GetTimeSeconds();
+	if (Now - LastRollTime < RollCooldown) return;
+	if (bIsRolling) return;
+
+	LastRollTime = Now;
+	bIsRolling = true;
+
+	// Launch in movement direction
+	FVector RollDir = GetVelocity().IsNearlyZero()
+		? GetActorForwardVector()
+		: GetVelocity().GetSafeNormal();
+
+	LaunchCharacter(RollDir * RollDistance, true, false);
+
+	// Play roll montage if assigned
+	float MontageDuration = 0.5f;
+	if (RollMontage)
+		MontageDuration = PlayAnimMontage(RollMontage);
+
+	// Invincibility frames during roll
+	if (HealthComponent)
+		HealthComponent->bInvincible = true;
+
+	// End roll after montage
+	FTimerHandle RollTimer;
+	GetWorldTimerManager().SetTimer(RollTimer, [this]()
+	{
+		bIsRolling = false;
+		if (HealthComponent)
+			HealthComponent->bInvincible = false;
+	}, FMath::Max(MontageDuration, 0.4f), false);
 }
 
 void AFractureCharacter::ToggleCrouch()
